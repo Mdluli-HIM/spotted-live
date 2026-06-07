@@ -30,6 +30,7 @@ export function HomeExperience() {
 
   const activeTab: AppTab = "discover";
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeArea, setActiveArea] = useState("Braamfontein");
   const [activeMood, setActiveMood] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,10 +95,16 @@ export function HomeExperience() {
             onMoodChange={setActiveMood}
             onSelectListing={openListing}
             onToggleSaved={toggleSaved}
+            onOpenMenu={() => setMobileMenuOpen(true)}
           />
-
-          <BottomNavigation activeTab={activeTab} />
         </AppSurface>
+
+        <BottomNavigation activeTab={activeTab} />
+
+        <MobileMenu
+          open={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+        />
       </div>
 
       <DesktopHomeExperience
@@ -163,8 +170,6 @@ function DesktopHomeExperience({
   const featuredListing = visibleListings[0] ?? listings[0];
   const sideListings = visibleListings.slice(1, 4);
 
-  const title = "Find places, events and things to do.";
-
   return (
     <main className="hidden min-h-dvh w-full overflow-hidden bg-[#f8f8f8] lg:block">
       <section className="min-h-dvh w-full overflow-hidden bg-[#f8f8f8] px-8 py-6 xl:px-10">
@@ -212,7 +217,7 @@ function DesktopHomeExperience({
               </p>
 
               <h1 className="mt-5 max-w-[560px] text-[76px] font-medium leading-[0.86] tracking-[-0.09em] text-black xl:text-[92px]">
-                {title}
+                Find places, events and things to do.
               </h1>
 
               <p className="mt-7 max-w-[430px] text-[15px] leading-relaxed text-black/45">
@@ -231,7 +236,10 @@ function DesktopHomeExperience({
                   className="min-w-0 flex-1 bg-transparent text-[14px] font-medium text-black outline-none placeholder:text-black/30"
                 />
 
-                <button className="flex size-11 items-center justify-center rounded-full bg-[#1d1e20] text-white">
+                <button
+                  type="button"
+                  className="flex size-11 items-center justify-center rounded-full bg-[#1d1e20] text-white"
+                >
                   <SlidersHorizontal size={16} />
                 </button>
               </div>
@@ -541,6 +549,7 @@ type DiscoverScreenProps = {
   onMoodChange: (mood: string) => void;
   onSelectListing: (listing: Listing) => void;
   onToggleSaved: (listingId: string) => void;
+  onOpenMenu: () => void;
 };
 
 function DiscoverScreen({
@@ -555,6 +564,7 @@ function DiscoverScreen({
   onMoodChange,
   onSelectListing,
   onToggleSaved,
+  onOpenMenu,
 }: DiscoverScreenProps) {
   const title =
     activeTab === "events"
@@ -583,6 +593,7 @@ function DiscoverScreen({
           <button
             type="button"
             aria-label="Open menu"
+            onClick={onOpenMenu}
             className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_10px_25px_rgba(0,0,0,0.06)]"
           >
             <Menu size={18} />
@@ -608,7 +619,10 @@ function DiscoverScreen({
               <X size={14} />
             </button>
           ) : (
-            <button className="flex size-8 items-center justify-center rounded-full bg-[#1d1e20] text-white">
+            <button
+              type="button"
+              className="flex size-8 items-center justify-center rounded-full bg-[#1d1e20] text-white"
+            >
               <SlidersHorizontal size={14} />
             </button>
           )}
@@ -676,7 +690,7 @@ function DiscoverScreen({
         </Link>
       </section>
 
-      <section className="no-scrollbar mt-4 flex-1 space-y-4 overflow-y-auto px-5 pb-32">
+      <section className="no-scrollbar mt-4 flex-1 space-y-4 overflow-y-auto px-5 pb-40">
         {visibleListings.length > 0 ? (
           visibleListings.map((listing) => (
             <ListingCard
@@ -808,7 +822,10 @@ function BottomNavigation({ activeTab }: { activeTab: AppTab }) {
   ];
 
   return (
-    <nav className="fixed bottom-[calc(env(safe-area-inset-bottom)+20px)] left-1/2 z-50 flex h-[66px] w-[calc(100%-40px)] max-w-[330px] -translate-x-1/2 items-center justify-between rounded-full bg-[#1d1e20] px-3 shadow-[0_18px_40px_rgba(0,0,0,0.26)] lg:hidden">
+    <nav
+      onClick={(event) => event.stopPropagation()}
+      className="fixed bottom-[calc(env(safe-area-inset-bottom)+20px)] left-1/2 z-[999] flex h-[66px] w-[calc(100%-40px)] max-w-[330px] -translate-x-1/2 items-center justify-between rounded-full bg-[#1d1e20] px-3 shadow-[0_18px_40px_rgba(0,0,0,0.26)] lg:hidden"
+    >
       {items.map((item) => {
         const Icon = item.icon;
         const active = activeTab === item.value;
@@ -818,6 +835,7 @@ function BottomNavigation({ activeTab }: { activeTab: AppTab }) {
             key={item.value}
             href={item.href}
             aria-label={item.label}
+            onClick={(event) => event.stopPropagation()}
             className={`flex size-12 items-center justify-center rounded-full transition-colors ${
               active ? "bg-white text-black" : "text-white/70"
             }`}
@@ -830,5 +848,63 @@ function BottomNavigation({ activeTab }: { activeTab: AppTab }) {
         );
       })}
     </nav>
+  );
+}
+
+function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+  if (!open) {
+    return null;
+  }
+
+  const links = [
+    { label: "Discover", href: "/" },
+    { label: "Places", href: "/places" },
+    { label: "Events", href: "/events" },
+    { label: "Saved", href: "/saved" },
+    { label: "For owners", href: "/for-owners" },
+    { label: "Owner dashboard", href: "/owner/dashboard" },
+    { label: "Admin review", href: "/admin/moderation" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[1000] bg-black/25 px-4 py-4 backdrop-blur-sm lg:hidden">
+      <div className="ml-auto max-w-[360px] overflow-hidden rounded-[34px] bg-[#f8f8f8] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.22)]">
+        <div className="flex items-center justify-between">
+          <BrandWordmark compact />
+
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={onClose}
+            className="flex size-11 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_25px_rgba(0,0,0,0.06)]"
+          >
+            <X size={17} />
+          </button>
+        </div>
+
+        <div className="mt-8 space-y-2">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={onClose}
+              className="flex items-center justify-between rounded-[22px] bg-white px-5 py-4 text-[15px] font-semibold tracking-[-0.035em] text-black shadow-[0_10px_25px_rgba(0,0,0,0.035)]"
+            >
+              {link.label}
+
+              <ArrowRight size={16} />
+            </Link>
+          ))}
+        </div>
+
+        <Link
+          href="/owner/create-listing"
+          onClick={onClose}
+          className="mt-5 flex w-full items-center justify-center rounded-full bg-[#1d1e20] px-5 py-4 text-[13px] font-semibold text-white"
+        >
+          Create listing
+        </Link>
+      </div>
+    </div>
   );
 }
