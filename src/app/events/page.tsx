@@ -1,3 +1,5 @@
+import { ListingDirectoryExperience } from "@/components/listings/listing-directory-experience";
+
 export default function EventsPage() {
-  return <div>Events page coming soon.</div>;
+  return <ListingDirectoryExperience mode="events" />;
 }

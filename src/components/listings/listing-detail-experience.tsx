@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
- 
   CheckCircle2,
   Copy,
   Heart,
@@ -15,6 +14,7 @@ import {
   Star,
 } from "lucide-react";
 
+import { useSavedListings } from "@/hooks/use-saved-listings";
 import { BrandWordmark } from "@/components/brand/brand-wordmark";
 import type { Listing } from "@/types/listing";
 
@@ -27,7 +27,8 @@ export function ListingDetailExperience({
   listing,
   similarListings,
 }: ListingDetailExperienceProps) {
-  const [saved, setSaved] = useState(false);
+  const { isListingSaved, toggleSavedListing } = useSavedListings();
+  const saved = isListingSaved(listing.id);
   const [copied, setCopied] = useState(false);
 
   async function shareListing() {
@@ -81,7 +82,7 @@ export function ListingDetailExperience({
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setSaved((current) => !current)}
+                onClick={() => toggleSavedListing(listing.id)}
                 className={`flex size-12 items-center justify-center rounded-full shadow-[0_14px_34px_rgba(0,0,0,0.12)] ${
                   saved ? "bg-[#1d1e20] text-white" : "bg-white text-black"
                 }`}
@@ -247,7 +248,7 @@ export function ListingDetailExperience({
                       {item.area} · {item.priceLabel}
                     </p>
 
-                   <p className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-black/55">
+                    <p className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-black/55">
                       <Star size={12} fill="currentColor" />
                       {item.rating.toFixed(1)}
                     </p>

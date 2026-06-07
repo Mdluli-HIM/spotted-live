@@ -1,3 +1,5 @@
+import { ListingDirectoryExperience } from "@/components/listings/listing-directory-experience";
+
 export default function SavedPage() {
-  return <div>Saved page coming soon.</div>;
+  return <ListingDirectoryExperience mode="saved" />;
 }

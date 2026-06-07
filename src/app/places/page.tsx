@@ -1,3 +1,5 @@
+import { ListingDirectoryExperience } from "@/components/listings/listing-directory-experience";
+
 export default function PlacesPage() {
-  return <div>Places page coming soon.</div>;
+  return <ListingDirectoryExperience mode="places" />;
 }
