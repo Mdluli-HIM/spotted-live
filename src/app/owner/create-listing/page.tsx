@@ -1,3 +1,5 @@
+import { CreateListingExperience } from "@/components/owners/create-listing-experience";
+
 export default function CreateListingPage() {
-  return <div>Create listing page coming soon.</div>;
+  return <CreateListingExperience />;
 }

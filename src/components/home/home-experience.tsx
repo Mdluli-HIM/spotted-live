@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, type ElementType } from "react";
 import {
   ArrowLeft,
@@ -21,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 
+import { useLocalOwnerListings } from "@/hooks/use-local-owner-listings";
 import { BrandWordmark } from "@/components/brand/brand-wordmark";
 import { listings, locationFilters, moodFilters } from "@/data/listings";
 import type { Listing } from "@/types/listing";
@@ -34,11 +36,17 @@ export function HomeExperience() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const { approvedListings } = useLocalOwnerListings();
+  const publicListings = useMemo(
+    () => [...approvedListings, ...listings],
+    [approvedListings],
+  );
+  const router = useRouter();
 
   const filteredListings = useMemo(() => {
     const cleanQuery = searchQuery.trim().toLowerCase();
 
-    return listings.filter((listing) => {
+    return publicListings.filter((listing) => {
       const matchesTab =
         activeTab === "events"
           ? listing.type === "event"
@@ -72,7 +80,14 @@ export function HomeExperience() {
 
       return matchesTab && matchesSearch && (matchesArea || matchesMood);
     });
-  }, [activeArea, activeMood, activeTab, savedIds, searchQuery]);
+  }, [
+    activeArea,
+    activeMood,
+    activeTab,
+    publicListings,
+    savedIds,
+    searchQuery,
+  ]);
 
   function toggleSaved(listingId: string) {
     setSavedIds((current) =>
@@ -123,7 +138,9 @@ export function HomeExperience() {
               onSearchChange={setSearchQuery}
               onAreaChange={setActiveArea}
               onMoodChange={setActiveMood}
-              onSelectListing={setSelectedListing}
+              onSelectListing={(listing) =>
+                router.push(`/listings/${listing.slug}`)
+              }
               onToggleSaved={toggleSaved}
             />
           )}
@@ -195,7 +212,8 @@ function DesktopHomeExperience({
   onSelectListing,
   onToggleSaved,
 }: DesktopHomeExperienceProps) {
-  const featuredListing = visibleListings[0] ?? listings[0];
+  const featuredListing =
+    visibleListings[0] ?? listings[0];
   const sideListings = visibleListings.slice(1, 4);
 
   const title =
