@@ -881,7 +881,7 @@ function DiscoverScreen({
         </button>
       </section>
 
-      <section className="no-scrollbar mt-4 flex-1 space-y-4 overflow-y-auto px-5 pb-4">
+      <section className="no-scrollbar mt-4 flex-1 space-y-4 overflow-y-auto px-5 pb-32">
         {visibleListings.length > 0 ? (
           visibleListings.map((listing) => (
             <ListingCard
@@ -1238,7 +1238,7 @@ function BottomNavigation({
   ];
 
   return (
-    <nav className="absolute bottom-5 left-1/2 z-40 flex h-[66px] w-[calc(100%-40px)] max-w-[330px] -translate-x-1/2 items-center justify-between rounded-full bg-[#1d1e20] px-3 shadow-[0_18px_40px_rgba(0,0,0,0.26)]">
+    <nav className="fixed bottom-[calc(env(safe-area-inset-bottom)+20px)] left-1/2 z-50 flex h-[66px] w-[calc(100%-40px)] max-w-[330px] -translate-x-1/2 items-center justify-between rounded-full bg-[#1d1e20] px-3 shadow-[0_18px_40px_rgba(0,0,0,0.26)] lg:hidden">
       {items.map((item) => {
         const Icon = item.icon;
         const active = activeTab === item.value;
