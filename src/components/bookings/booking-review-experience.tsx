@@ -2,7 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, MapPin, Star, Users, X } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  CheckCircle2,
+  MapPin,
+  MessageCircle,
+  Users,
+  X,
+} from "lucide-react";
 
 import type { Listing } from "@/types/listing";
 
@@ -14,109 +22,146 @@ export function BookingReviewExperience({
   listing,
 }: BookingReviewExperienceProps) {
   return (
-    <main className="min-h-dvh bg-white text-black">
-      <section className="mx-auto flex min-h-dvh w-full max-w-[460px] flex-col px-5 py-5">
+    <main className="min-h-dvh bg-[#f8f8f8] text-black">
+      <section className="mx-auto flex min-h-dvh w-full max-w-[500px] flex-col px-5 py-5">
         <header className="flex items-center justify-between">
           <Link
             href={`/listings/${listing.slug}`}
-            className="flex size-11 items-center justify-center rounded-full bg-[#f4f4f2]"
+            className="flex size-11 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(0,0,0,0.04)]"
           >
             <ArrowLeft size={18} />
           </Link>
 
           <Link
             href={`/listings/${listing.slug}`}
-            className="flex size-11 items-center justify-center rounded-full bg-[#f4f4f2]"
+            className="flex size-11 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(0,0,0,0.04)]"
           >
             <X size={18} />
           </Link>
         </header>
 
         <section className="pt-8">
-          <h1 className="text-[32px] font-semibold leading-[0.95] tracking-[-0.065em]">
-            Review and continue
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/25">
+            Reservation request
+          </p>
+
+          <h1 className="mt-4 text-[48px] font-semibold leading-[0.86] tracking-[-0.085em]">
+            Request your spot.
           </h1>
 
-          <div className="mt-6 rounded-[24px] border border-black/10 p-4">
-            <div className="flex gap-4">
-              <div className="relative size-24 shrink-0 overflow-hidden rounded-[18px]">
-                <Image
-                  src={listing.image}
-                  alt={listing.title}
-                  fill
-                  sizes="96px"
-                  className="object-cover"
-                />
-              </div>
+          <p className="mt-4 max-w-[380px] text-[13px] leading-relaxed text-black/45">
+            This is a clean frontend preview of the booking flow. Later the API
+            will store the request, notify the place owner and track the status.
+          </p>
 
-              <div className="min-w-0 flex-1">
-                <h2 className="text-[17px] font-semibold leading-tight tracking-[-0.04em]">
-                  {listing.title}
-                </h2>
+          <div className="mt-7 overflow-hidden rounded-[34px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
+            <div className="relative h-[210px]">
+              <Image
+                src={listing.image}
+                alt={listing.title}
+                fill
+                priority
+                sizes="500px"
+                className="object-cover"
+              />
 
-                <p className="mt-1 text-[12px] text-black/45">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+              <div className="absolute bottom-5 left-5 right-5 text-white">
+                <p className="text-[11px] font-medium text-white/70">
                   Spot: {listing.area}
                 </p>
 
-                <p className="mt-2 flex items-center gap-1 text-[12px] font-semibold">
-                  <Star size={13} fill="currentColor" />
-                  {listing.rating.toFixed(1)}
+                <h2 className="mt-2 max-w-[340px] text-[34px] font-semibold leading-[0.9] tracking-[-0.075em]">
+                  {listing.title}
+                </h2>
+              </div>
+            </div>
+
+            <div className="p-5">
+              <div className="grid grid-cols-3 divide-x divide-black/10 rounded-[24px] bg-[#f4f4f2] py-4 text-center">
+                <div>
+                  <p className="text-[16px] font-semibold">
+                    {listing.rating.toFixed(1)}
+                  </p>
+                  <p className="mt-1 text-[10px] text-black/40">Rating</p>
+                </div>
+
+                <div>
+                  <p className="text-[16px] font-semibold">{listing.saves}</p>
+                  <p className="mt-1 text-[10px] text-black/40">Saves</p>
+                </div>
+
+                <div>
+                  <p className="text-[16px] font-semibold">{listing.shares}</p>
+                  <p className="mt-1 text-[10px] text-black/40">Shares</p>
+                </div>
+              </div>
+
+              <div className="mt-5 divide-y divide-black/10">
+                <ReviewRow
+                  icon={CalendarDays}
+                  title="Date / time"
+                  value={listing.startsAt ?? "Open today"}
+                  action="Change"
+                />
+
+                <ReviewRow
+                  icon={Users}
+                  title="People"
+                  value="1 person"
+                  action="Edit"
+                />
+
+                <ReviewRow
+                  icon={MapPin}
+                  title="Spot"
+                  value={`${listing.area} · ${listing.location}`}
+                  action="View"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-[30px] bg-[#1d1e20] p-5 text-white">
+            <div className="flex items-start gap-4">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/10">
+                <MessageCircle size={17} />
+              </span>
+
+              <div>
+                <h3 className="text-[18px] font-semibold tracking-[-0.045em]">
+                  What happens next?
+                </h3>
+
+                <p className="mt-2 text-[13px] leading-relaxed text-white/45">
+                  We will use this screen later to send a real reservation
+                  request to the place owner. For now, it shows the structure of
+                  the booking flow.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 divide-y divide-black/10">
-              <ReviewRow
-                icon={CalendarDays}
-                title="Date / time"
-                value={listing.startsAt ?? "Open today"}
-                action="Change"
-              />
-
-              <ReviewRow
-                icon={Users}
-                title="Guests"
-                value="1 person"
-                action="Change"
-              />
-
-              <ReviewRow
-                icon={MapPin}
-                title="Location"
-                value={listing.location}
-                action="View"
-              />
-            </div>
-
-            <div className="mt-5 rounded-[18px] bg-[#f4f4f2] p-4">
-              <p className="text-[1px] font-semibold">Reservation note</p>
-
-              <p className="mt-2 text-[12px] leading-relaxed text-black/50">
-                This is the frontend booking preview. When we connect the API,
-                this step will create a reservation request, store the guest
-                details, notify the place owner and track the request status.
-              </p>
+            <div className="mt-5 grid gap-2">
+              <StepItem title="Confirm request details" />
+              <StepItem title="Send request to owner" />
+              <StepItem title="Track request status" />
             </div>
           </div>
         </section>
 
-        <section className="mt-auto border-t border-black/10 pt-4">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-[14px] font-semibold">Reservation request</p>
+        <section className="mt-auto pt-5">
+          <button
+            type="button"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#1d1e20] px-8 py-4 text-[13px] font-semibold text-white"
+          >
+            Continue request
+            <CheckCircle2 size={16} />
+          </button>
 
-              <p className="mt-1 text-[11px] text-black/45">
-                No payment required
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="rounded-full bg-[#1d1e20] px-8 py-4 text-[13px] font-semibold text-white"
-            >
-              Continue
-            </button>
-          </div>
+          <p className="mt-3 text-center text-[11px] leading-relaxed text-black/35">
+            No payment required. This is a reservation request preview.
+          </p>
         </section>
       </section>
     </main>
@@ -151,6 +196,15 @@ function ReviewRow({
       >
         {action}
       </button>
+    </div>
+  );
+}
+
+function StepItem({ title }: { title: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-[18px] bg-white/8 px-4 py-3">
+      <span className="text-[12px] font-semibold text-white/65">{title}</span>
+      <span className="size-2 rounded-full bg-[var(--accent)]" />
     </div>
   );
 }

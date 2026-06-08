@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ArrowRight,
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
@@ -33,7 +34,7 @@ type ListingDetailExperienceProps = {
 export function ListingDetailExperience({
   listing,
 }: ListingDetailExperienceProps) {
-  const mobileGalleryRef = useRef<HTMLDivElement | null>(null);
+  const galleryRef = useRef<HTMLDivElement | null>(null);
 
   const [copied, setCopied] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -47,6 +48,8 @@ export function ListingDetailExperience({
     listing.images && listing.images.length > 0
       ? listing.images
       : [listing.image];
+
+  const previewImages = galleryImages.slice(0, 4);
 
   const highlights = [
     {
@@ -103,7 +106,7 @@ export function ListingDetailExperience({
   }
 
   function handleGalleryScroll() {
-    const gallery = mobileGalleryRef.current;
+    const gallery = galleryRef.current;
 
     if (!gallery) {
       return;
@@ -111,6 +114,11 @@ export function ListingDetailExperience({
 
     const index = Math.round(gallery.scrollLeft / gallery.clientWidth);
     setActiveImageIndex(index);
+  }
+
+  function openGallery(index: number) {
+    setActiveImageIndex(index);
+    setGalleryOpen(true);
   }
 
   return (
@@ -243,67 +251,143 @@ export function ListingDetailExperience({
         </section>
 
         {/* MOBILE HERO */}
-        <section className="relative h-[360px] overflow-hidden bg-black lg:hidden">
-          <div
-            ref={mobileGalleryRef}
-            onScroll={handleGalleryScroll}
-            className="no-scrollbar flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
-          >
-            {galleryImages.map((image, index) => (
+        <section className="relative overflow-hidden bg-[#f8f8f8] px-4 pt-4 lg:hidden">
+          <div className="relative overflow-hidden rounded-[36px] bg-[#1d1e20] shadow-[0_28px_80px_rgba(0,0,0,0.22)]">
+            <div
+              ref={galleryRef}
+              onScroll={handleGalleryScroll}
+              className="no-scrollbar flex h-[430px] w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
+            >
+              {galleryImages.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  onClick={() => openGallery(index)}
+                  className="relative h-full w-full shrink-0 snap-center"
+                >
+                  <Image
+                    src={image}
+                    alt={`${listing.title} photo ${index + 1}`}
+                    fill
+                    priority={index === 0}
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/88 via-black/18 to-black/18" />
+
+            <div className="pointer-events-none absolute -left-16 top-24 size-48 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-20 bottom-16 size-56 rounded-full bg-[var(--accent)]/20 blur-3xl" />
+
+            <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
+              <Link
+                href="/"
+                className="flex size-11 items-center justify-center rounded-full bg-white/95 text-black shadow-[0_14px_34px_rgba(0,0,0,0.16)] backdrop-blur-xl"
+              >
+                <ArrowLeft size={18} />
+              </Link>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleSavedListing(listing.id)}
+                  className={`flex size-11 items-center justify-center rounded-full shadow-[0_14px_34px_rgba(0,0,0,0.16)] backdrop-blur-xl ${
+                    saved ? "bg-[#1d1e20] text-white" : "bg-white/95 text-black"
+                  }`}
+                >
+                  <Heart size={18} fill={saved ? "currentColor" : "none"} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={shareListing}
+                  className="flex size-11 items-center justify-center rounded-full bg-white/95 text-black shadow-[0_14px_34px_rgba(0,0,0,0.16)] backdrop-blur-xl"
+                >
+                  {copied ? <Copy size={17} /> : <Share2 size={17} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="absolute left-4 right-4 top-[72px] flex items-center justify-between">
+              <span className="rounded-full bg-white/14 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-xl">
+                SPOTTED VIEW
+              </span>
+
               <button
-                key={`${image}-${index}`}
                 type="button"
                 onClick={() => setGalleryOpen(true)}
-                className="relative h-full w-full shrink-0 snap-center"
+                className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-2 text-[11px] font-semibold text-white backdrop-blur-xl"
               >
-                <Image
-                  src={image}
-                  alt={`${listing.title} photo ${index + 1}`}
-                  fill
-                  priority={index === 0}
-                  sizes="100vw"
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
-
-          <div className="absolute left-5 right-5 top-7 flex items-center justify-between">
-            <Link
-              href="/"
-              className="flex size-11 items-center justify-center rounded-full bg-white text-black shadow-[0_14px_34px_rgba(0,0,0,0.12)]"
-            >
-              <ArrowLeft size={18} />
-            </Link>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => toggleSavedListing(listing.id)}
-                className={`flex size-11 items-center justify-center rounded-full shadow-[0_14px_34px_rgba(0,0,0,0.12)] ${
-                  saved ? "bg-[#1d1e20] text-white" : "bg-white text-black"
-                }`}
-              >
-                <Heart size={18} fill={saved ? "currentColor" : "none"} />
-              </button>
-
-              <button
-                type="button"
-                onClick={shareListing}
-                className="flex size-11 items-center justify-center rounded-full bg-white text-black shadow-[0_14px_34px_rgba(0,0,0,0.12)]"
-              >
-                {copied ? <Copy size={17} /> : <Share2 size={17} />}
+                <ImageIcon size={13} />
+                {activeImageIndex + 1}/{galleryImages.length}
               </button>
             </div>
-          </div>
 
-          {galleryImages.length > 1 && (
-            <span className="absolute bottom-4 right-4 rounded-full bg-black/55 px-3 py-2 text-[11px] font-semibold text-white backdrop-blur-xl">
-              {activeImageIndex + 1}/{galleryImages.length}
-            </span>
-          )}
+            <div className="absolute bottom-5 left-4 right-4 text-white">
+              <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70 drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]">
+                <MapPin size={13} />
+                Spot: {listing.area}
+              </p>
+
+              <h1 className="mt-3 max-w-[310px] text-[42px] font-semibold leading-[0.86] tracking-[-0.09em] drop-shadow-[0_4px_18px_rgba(0,0,0,0.45)]">
+                {listing.title}
+              </h1>
+
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-2">
+                  {previewImages.map((image, index) => (
+                    <button
+                      key={`${image}-preview-${index}`}
+                      type="button"
+                      onClick={() => openGallery(index)}
+                      className={`relative size-12 shrink-0 overflow-hidden rounded-[16px] border shadow-[0_10px_26px_rgba(0,0,0,0.22)] transition-all ${
+                        activeImageIndex === index
+                          ? "border-white"
+                          : "border-white/30 opacity-80"
+                      }`}
+                    >
+                      <Image
+                        src={image}
+                        alt={`${listing.title} preview ${index + 1}`}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setGalleryOpen(true)}
+                  className="flex shrink-0 items-center gap-2 rounded-full bg-white px-4 py-3 text-[11px] font-semibold text-black shadow-[0_12px_30px_rgba(0,0,0,0.22)]"
+                >
+                  Gallery
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+
+              {galleryImages.length > 1 && (
+                <div className="mt-4 flex items-center gap-1.5">
+                  {galleryImages.map((image, index) => (
+                    <button
+                      key={`${image}-mobile-dot-${index}`}
+                      type="button"
+                      onClick={() => openGallery(index)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        activeImageIndex === index
+                          ? "w-7 bg-white"
+                          : "w-1.5 bg-white/35"
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
         {/* MOBILE TITLE CARD */}
@@ -669,80 +753,137 @@ function GalleryModal({
   onClose: () => void;
   onChangeImage: (index: number) => void;
 }) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open || !scrollerRef.current) {
+      return;
+    }
+
+    const scroller = scrollerRef.current;
+
+    requestAnimationFrame(() => {
+      scroller.scrollTo({
+        left: scroller.clientWidth * activeImageIndex,
+        behavior: "auto",
+      });
+    });
+  }, [activeImageIndex, open]);
+
   if (!open) {
     return null;
   }
 
-  const activeImage = images[activeImageIndex] ?? images[0];
+  function scrollToImage(index: number) {
+    const scroller = scrollerRef.current;
 
-  function goNext() {
-    onChangeImage(
-      activeImageIndex === images.length - 1 ? 0 : activeImageIndex + 1,
-    );
+    if (!scroller) {
+      return;
+    }
+
+    const safeIndex =
+      index < 0 ? images.length - 1 : index > images.length - 1 ? 0 : index;
+
+    scroller.scrollTo({
+      left: scroller.clientWidth * safeIndex,
+      behavior: "smooth",
+    });
+
+    onChangeImage(safeIndex);
   }
 
-  function goPrevious() {
-    onChangeImage(
-      activeImageIndex === 0 ? images.length - 1 : activeImageIndex - 1,
-    );
+  function handleScroll() {
+    const scroller = scrollerRef.current;
+
+    if (!scroller) {
+      return;
+    }
+
+    const index = Math.round(scroller.scrollLeft / scroller.clientWidth);
+
+    if (index !== activeImageIndex) {
+      onChangeImage(index);
+    }
   }
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-[#111111] text-white">
-      <header className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-5 py-5 lg:px-8">
+    <div className="fixed inset-0 z-[1000] bg-[#101010] text-white">
+      <header className="absolute left-0 right-0 top-0 z-30 flex items-center justify-between px-5 py-5">
         <button
           type="button"
           onClick={onClose}
-          className="flex size-11 items-center justify-center rounded-full bg-white text-black"
+          className="flex size-11 items-center justify-center rounded-full bg-white text-black shadow-[0_14px_34px_rgba(0,0,0,0.22)]"
         >
           <X size={18} />
         </button>
 
-        <p className="text-[12px] font-semibold text-white/60">
+        <p className="rounded-full bg-white/10 px-4 py-2 text-[12px] font-semibold text-white/80 backdrop-blur-xl">
           {activeImageIndex + 1} / {images.length}
         </p>
       </header>
 
-      <div className="relative flex h-full items-center justify-center px-4 py-20 lg:px-24">
-        <button
-          type="button"
-          onClick={goPrevious}
-          className="absolute left-5 z-20 hidden size-12 items-center justify-center rounded-full bg-white text-black lg:flex"
-        >
-          <ArrowLeft size={18} />
-        </button>
-
-        <div className="relative h-full max-h-[780px] w-full max-w-[1120px] overflow-hidden rounded-[24px]">
-          <Image
-            src={activeImage}
-            alt={listingTitle}
-            fill
-            sizes="100vw"
-            className="object-contain"
-          />
-        </div>
-
-        <button
-          type="button"
-          onClick={goNext}
-          className="absolute right-5 z-20 hidden size-12 items-center justify-center rounded-full bg-white text-black lg:flex"
-        >
-          <ArrowLeft size={18} className="rotate-180" />
-        </button>
-      </div>
-
-      <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-2 px-5">
+      <div
+        ref={scrollerRef}
+        onScroll={handleScroll}
+        className="no-scrollbar flex h-dvh w-full snap-x snap-mandatory overflow-x-auto scroll-smooth"
+      >
         {images.map((image, index) => (
-          <button
-            key={`${image}-modal-dot-${index}`}
-            type="button"
-            onClick={() => onChangeImage(index)}
-            className={`h-1.5 rounded-full transition-all ${
-              activeImageIndex === index ? "w-7 bg-white" : "w-1.5 bg-white/35"
-            }`}
-          />
+          <div
+            key={`${image}-gallery-${index}`}
+            className="relative flex h-dvh w-full shrink-0 snap-center items-center justify-center"
+          >
+            <div className="relative h-full w-full">
+              <Image
+                src={image}
+                alt={`${listingTitle} gallery image ${index + 1}`}
+                fill
+                priority={index === activeImageIndex}
+                sizes="100vw"
+                className="object-cover"
+              />
+            </div>
+
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20" />
+          </div>
         ))}
       </div>
+
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={() => scrollToImage(activeImageIndex - 1)}
+            className="absolute left-5 top-1/2 z-30 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_14px_34px_rgba(0,0,0,0.22)] sm:flex"
+          >
+            <ArrowLeft size={18} />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={() => scrollToImage(activeImageIndex + 1)}
+            className="absolute right-5 top-1/2 z-30 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full bg-white text-black shadow-[0_14px_34px_rgba(0,0,0,0.22)] sm:flex"
+          >
+            <ArrowRight size={18} />
+          </button>
+
+          <div className="absolute bottom-[calc(env(safe-area-inset-bottom)+22px)] left-0 right-0 z-30 flex justify-center gap-2 px-5">
+            {images.map((image, index) => (
+              <button
+                key={`${image}-modal-dot-${index}`}
+                type="button"
+                onClick={() => scrollToImage(index)}
+                className={`h-1.5 rounded-full transition-all ${
+                  activeImageIndex === index
+                    ? "w-8 bg-white"
+                    : "w-1.5 bg-white/35"
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

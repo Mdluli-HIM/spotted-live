@@ -28,6 +28,16 @@ export type ListingOwner = {
   verified: boolean;
 };
 
+export type ListingReview = {
+  id: string;
+  name: string;
+  avatar: string;
+  location: string;
+  rating: number;
+  timeAgo: string;
+  comment: string;
+};
+
 export type Listing = {
   id: string;
   slug: string;
@@ -45,6 +55,7 @@ export type Listing = {
   rating: number;
   saves: number;
   shares: number;
+  reviews?: ListingReview[];
   isFeatured?: boolean;
   isHappeningToday?: boolean;
   startsAt?: string;
